@@ -1,0 +1,83 @@
+.tabs-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  /* background-color: #f5f5f5; */
+  width: 80%; /* Or any width you prefer */
+  
+  padding: 20px; /* Or any padding you prefer */
+}
+
+
+.tab-buttons {
+  display: flex; /* Align buttons side by side */
+  /* border-bottom: 1px solid #ccc;  */
+}
+
+.tab-buttons button {
+  padding: 30px 50px;
+  border: 1px solid black; /* Remove default borders */
+  border-bottom: 4px solid transparent; /* Invisible border to keep height consistent */
+  border-radius: 12px 8px 0 8px;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  font-weight: bold; /* Make text bold */
+}
+
+.tab-buttons button:hover {
+  background-color: #f2f2f2; /* Slight background color on hover */
+}
+
+.tab-buttons .active {
+  border-bottom: 4px solid #000; /* Black border for active tab */
+  background-color: #fff;
+}
+
+
+.form-container {
+  font-family: Arial, sans-serif;
+}
+
+
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.other-specify {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 20px;
+}
+
+
+/* Tabsection2.css */
+.form-container h2 {
+  color: #333; /* Light black color */
+  font-size: 18px; /* Slightly larger text for the heading */
+}
+
+.form-container label {
+  font-size: 16px; /* Larger text for checkbox labels */
+}
+
+.form-container input[type='checkbox'] {
+  transform: scale(1.6); /* Makes checkboxes larger */
+  margin-right: 5px;
+}
+
+.note {
+  font-size: 14px;
+  color: #333; /* Light black color for the note */
+}
+
