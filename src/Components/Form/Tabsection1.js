@@ -98,57 +98,94 @@ const Tabsection1 = ({ onNext }) => {
   const [editTitle, setEditTitle] = useState("");
   const [editTelephone, setEditTelephone] = useState("");
   const [editEmail, setEditEmail] = useState("");
-  // const [editState, setEditState] = useState("");
+  const [editCountry, setEditCountry] = useState("");
+  const [editState, setEditState] = useState("");
   const [editCity, setEditCity] = useState("");
   const [editUrl, setEditUrl] = useState("");
   const [editPincode, setEditPincode] = useState("");
   const [editBusinessAddress, setEditBusinessAddress] = useState("");
   const [editTransactionHandler, setEditTransactionHandler] = useState("");
   const [editCardDetails, setEditCardDetails] = useState("");
+  const [editFacilityData, setEditFacilityData] = useState({
+    type: "",
+    number: "",
+    location: "",
+  });
+  const [editPaymentApplication, setEditPaymentApplication] = useState({
+    name: "",
+    version: "",
+    vendor: "",
+    isListed: true,
+    expiryDate: "",
+  });
   useEffect(() => {
-    if (formData && formData[0]?.partResponse) {
-      setEditCompanyName(formData[0].partResponse);
+    if (formData && formData.length > 0) {
+      const partNameToSetterMap = {
+        "Company Name": setEditCompanyName,
+        DBA: setEditDba,
+        "Contact Name": setEditContactName,
+        Title: setEditTitle,
+        Telephone: setEditTelephone,
+        "E-mail": setEditEmail,
+        Country: setEditCountry,
+        "State/Province": setEditState,
+        City: setEditCity,
+        URL: setEditUrl,
+        Pincode: setEditPincode,
+        "Business Address": setEditBusinessAddress,
+        "Transaction Handler": setEditTransactionHandler,
+        "Card Details Entry": setEditCardDetails,
+        "Facility 1": setEditFacilityData.type,
+        "Facility 1": setEditFacilityData.number,
+        "Facility 1": setEditFacilityData.location,
+        "Payment Application 1": setEditPaymentApplication.name,
+        "Payment Application 1": setEditPaymentApplication.expiryDate,
+        "Payment Application 1": setEditPaymentApplication.isListed,
+        "Payment Application 1": setEditPaymentApplication.vendor,
+        "Payment Application 1": setEditPaymentApplication.version,
+      };
+
+      formData.forEach((item) => {
+        const { partName, partResponse } = item;
+        const setter = partNameToSetterMap[partName];
+        if (setter) {
+          setter(partResponse);
+        }
+      });
     }
-    if (formData && formData[1]?.partResponse) {
-      setEditDba(formData[1].partResponse);
+    if (formData) {
+      // Find the item with partName "Facility 1"
+      const facilityItem = formData.find(
+        (item) => item.partName === "Facility 1"
+      );
+      if (facilityItem) {
+        // Parse the JSON string from partResponse to an object
+        const facilityObject = JSON.parse(facilityItem.partResponse);
+        // Set the parsed object to state
+        setEditFacilityData(facilityObject);
+      }
     }
-    if (formData && formData[2]?.partResponse) {
-      setEditContactName(formData[2].partResponse);
-    }
-    if (formData && formData[3]?.partResponse) {
-      setEditTitle(formData[3].partResponse);
-    }
-    if (formData && formData[4]?.partResponse) {
-      setEditTelephone(formData[4].partResponse);
-    }
-    if (formData && formData[5]?.partResponse) {
-      setEditEmail(formData[5].partResponse);
-    }
-    // if (formData && formData[7]?.partResponse) {
-    //   setEditState(formData[7].partResponse);
-    // }
-    if (formData && formData[8]?.partResponse) {
-      setEditCity(formData[8].partResponse);
-    }
-    if (formData && formData[9]?.partResponse) {
-      setEditUrl(formData[9].partResponse);
-    }
-    if (formData && formData[10]?.partResponse) {
-      setEditPincode(formData[10].partResponse);
-    }
-    if (formData && formData[11]?.partResponse) {
-      setEditBusinessAddress(formData[11].partResponse);
-    }
-    if (formData && formData[12]?.partResponse) {
-      setEditTransactionHandler(formData[12].partResponse);
-    }
-    if (formData && formData[13]?.partResponse) {
-      setEditCardDetails(formData[13].partResponse);
+
+    if (formData) {
+      // Find the item with partName "Facility 1"
+      const paymentApplication = formData.find(
+        (item) => item.partName === "Payment Application 1"
+      );
+      if (paymentApplication) {
+        // Parse the JSON string from partResponse to an object
+        const paymentApplicationObject = JSON.parse(
+          paymentApplication.partResponse
+        );
+        // Set the parsed object to state
+        setEditPaymentApplication(paymentApplicationObject);
+      }
     }
   }, [formData]);
 
   console.log("companyName", editCompanyName);
-  // console.log("editState", editState);
+  console.log("editState", editState);
+  console.log("facilityData", editFacilityData);
+  console.log("editPaymentApplication", editPaymentApplication);
 
   // ..............................................part 3...................................
 
@@ -203,6 +240,7 @@ const Tabsection1 = ({ onNext }) => {
 
       console.log("API Response:", response.data.message);
       toast.success(result.message);
+      window.location.reload();
 
       // Additional logic or state updates after successful submission
     } catch (error) {
@@ -860,14 +898,22 @@ const Tabsection1 = ({ onNext }) => {
                           id="country"
                           label="Country"
                           helperText=" "
-                          value={country}
+                          value={
+                            formData && formData.length > 0
+                              ? editCountry
+                              : country
+                          }
                           // value={
                           //   (formData && formData[6]?.partResponse) || country
                           // }
                           InputLabelProps={{
                             shrink: true,
                           }}
-                          onChange={handleCountryChange}
+                          onChange={
+                            formData && formData.length > 0
+                              ? (e) => setEditCountry(e.target.value)
+                              : handleCountryChange
+                          }
                           required
                         />
                       </Grid>
@@ -880,7 +926,11 @@ const Tabsection1 = ({ onNext }) => {
                           <Select
                             labelId="state-province-label"
                             id="state-province"
-                            value={state}
+                            value={
+                              formData && formData.length > 0
+                                ? editState
+                                : state
+                            }
                             InputLabelProps={{
                               shrink: true,
                             }}
@@ -891,7 +941,11 @@ const Tabsection1 = ({ onNext }) => {
                             //     ? (e) => setEditState(e.target.value)
                             //     : handleStateChange
                             // }
-                            onChange={handleStateChange}
+                            onChange={
+                              formData && formData.length > 0
+                                ? (e) => setEditState(e.target.value)
+                                : handleStateChange
+                            }
                             disabled={country !== "India" && !isFormEditable} // Disable if country is not India
                             MenuProps={{
                               classes: { paper: classes.menu },
@@ -1200,17 +1254,26 @@ const Tabsection1 = ({ onNext }) => {
                                   required
                                   placeholder="Eg-Retail outlets"
                                   // value={row.type}
+                                  // value={
+                                  //   formData && formData[14]?.partResponse
+                                  //     ? JSON.parse(formData[14]?.partResponse)
+                                  //         ?.type || row.type
+                                  //     : row.type
+                                  // }
                                   value={
-                                    formData && formData[14]?.partResponse
-                                      ? JSON.parse(formData[14]?.partResponse)
-                                          ?.type || row.type
+                                    formData && formData.length > 0
+                                      ? editFacilityData.type
                                       : row.type
                                   }
                                   InputLabelProps={{
                                     shrink: true,
                                   }}
-                                  onChange={(e) =>
-                                    handleInputChange(e, index, "type")
+                                  onChange={
+                                    formData && formData.length > 0
+                                      ? (e) =>
+                                          setEditFacilityData(e.target.value)
+                                      : (e) =>
+                                          handleInputChange(e, index, "type")
                                   }
                                   fullWidth
                                 />
@@ -1222,18 +1285,30 @@ const Tabsection1 = ({ onNext }) => {
                                       ? !isFormEditable
                                       : isFormEditable
                                   }
+                                  // value={
+                                  //   formData && formData[14]?.partResponse
+                                  //     ? JSON.parse(formData[14].partResponse)
+                                  //         ?.number || row.number
+                                  //     : row.number
+                                  // }
                                   value={
-                                    formData && formData[14]?.partResponse
-                                      ? JSON.parse(formData[14].partResponse)
-                                          ?.number || row.number
+                                    formData && formData.length > 0
+                                      ? editFacilityData.number
                                       : row.number
                                   }
                                   required
                                   // value={row.number}
                                   type="number
 "
-                                  onChange={(e) =>
-                                    handleInputChange(e, index, "number")
+                                  // onChange={(e) =>
+                                  //   handleInputChange(e, index, "number")
+                                  // }
+                                  onChange={
+                                    formData && formData.length > 0
+                                      ? (e) =>
+                                          setEditFacilityData(e.target.value)
+                                      : (e) =>
+                                          handleInputChange(e, index, "number")
                                   }
                                   fullWidth
                                 />
@@ -1246,16 +1321,32 @@ const Tabsection1 = ({ onNext }) => {
                                       : isFormEditable
                                   }
                                   required
+                                  // value={
+                                  //   formData && formData[14]?.partResponse
+                                  //     ? JSON.parse(formData[14].partResponse)
+                                  //         ?.location || row.location
+                                  //     : row.location
+                                  // }
                                   value={
-                                    formData && formData[14]?.partResponse
-                                      ? JSON.parse(formData[14].partResponse)
-                                          ?.location || row.location
+                                    formData && formData.length > 0
+                                      ? editFacilityData.location
                                       : row.location
                                   }
                                   className={classes.formField}
                                   // value={row.location}
-                                  onChange={(e) =>
-                                    handleInputChange(e, index, "location")
+                                  // onChange={(e) =>
+                                  //   handleInputChange(e, index, "location")
+                                  // }
+                                  onChange={
+                                    formData && formData.length > 0
+                                      ? (e) =>
+                                          setEditFacilityData(e.target.value)
+                                      : (e) =>
+                                          handleInputChange(
+                                            e,
+                                            index,
+                                            "location"
+                                          )
                                   }
                                   fullWidth
                                 />
@@ -1388,9 +1479,8 @@ const Tabsection1 = ({ onNext }) => {
                                   }
                                   fullWidth
                                   value={
-                                    formData && formData[15]?.partResponse
-                                      ? JSON.parse(formData[15].partResponse)
-                                          ?.name || app.name
+                                    formData && formData.length > 0
+                                      ? editPaymentApplication.name
                                       : app.name
                                   }
                                 />
@@ -1409,9 +1499,8 @@ const Tabsection1 = ({ onNext }) => {
                                   }
                                   fullWidth
                                   value={
-                                    formData && formData[15]?.partResponse
-                                      ? JSON.parse(formData[15].partResponse)
-                                          ?.version || app.version
+                                    formData && formData.length > 0
+                                      ? editPaymentApplication.version
                                       : app.version
                                   }
                                 />
@@ -1430,9 +1519,8 @@ const Tabsection1 = ({ onNext }) => {
                                   }
                                   fullWidth
                                   value={
-                                    formData && formData[15]?.partResponse
-                                      ? JSON.parse(formData[15].partResponse)
-                                          ?.vendor || app.vendor
+                                    formData && formData.length > 0
+                                      ? editPaymentApplication.vendor
                                       : app.vendor
                                   }
                                 />
@@ -1471,9 +1559,8 @@ const Tabsection1 = ({ onNext }) => {
                                       : isFormEditable
                                   }
                                   value={
-                                    formData && formData[15]?.partResponse
-                                      ? JSON.parse(formData[15].partResponse)
-                                          ?.expiryDate || app.expiryDate
+                                    formData && formData.length > 0
+                                      ? editPaymentApplication.expiryDate
                                       : app.expiryDate
                                   }
                                   required
