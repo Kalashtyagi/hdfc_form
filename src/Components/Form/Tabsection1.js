@@ -322,7 +322,7 @@ const Tabsection1 = ({ onNext }) => {
     if (patchData.length > 0) {
       try {
         const response = await axios.patch(
-          `http://192.168.1.199:8181/api/PatchMerchantFormParts?formId=${fId}&merchantId=${mId}`,
+          `${apiUrl}PatchMerchantFormParts?formId=${fId}&merchantId=${mId}`,
           patchData,
           {
             headers: {
