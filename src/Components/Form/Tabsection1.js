@@ -56,6 +56,8 @@ const useStyles = makeStyles((theme) => ({
   // Additional custom styles...
 }));
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 const Tabsection1 = ({ onNext }) => {
   const [merchantExpanded, setMerchantExpanded] = useState(true); // State for Merchant Organization Information
   const [qsaExpanded, setQsaExpanded] = useState(true); // State for Qualified Security Assessor Information
@@ -118,6 +120,19 @@ const Tabsection1 = ({ onNext }) => {
     isListed: true,
     expiryDate: "",
   });
+  const [editMerchantUrl, setEditMerchantUrl] = useState(null);
+  const [editErpName, setEditErpName] = useState(null);
+  const [editPaymentGateway, setEditPaymentGateway] = useState(null);
+  const [editThirdServiceProvider, setEditThirdServiceProvider] =
+    useState(null);
+  const [editServiceProvider, setEditServiceProvider] = useState({
+    name: "",
+    description: "",
+  });
+  const [editExecutiveInformation, setEditExecutiveInformation] = useState({
+    executiveName: "",
+    executiveTitle: "",
+  });
   useEffect(() => {
     if (formData && formData.length > 0) {
       const partNameToSetterMap = {
@@ -143,6 +158,14 @@ const Tabsection1 = ({ onNext }) => {
         "Payment Application 1": setEditPaymentApplication.isListed,
         "Payment Application 1": setEditPaymentApplication.vendor,
         "Payment Application 1": setEditPaymentApplication.version,
+        "Merchant's Website URL": setEditMerchantUrl,
+        "ERP Name": setEditErpName,
+        "Payment Gateway": setEditPaymentGateway,
+        "Third Party Service Provider": setEditThirdServiceProvider,
+        "Service Provider 1": setEditServiceProvider.name,
+        "Service Provider 1": setEditServiceProvider.description,
+        "Executive Information": setEditExecutiveInformation.executiveName,
+        "Executive Information": setEditExecutiveInformation.executiveTitle,
       };
 
       formData.forEach((item) => {
@@ -180,6 +203,30 @@ const Tabsection1 = ({ onNext }) => {
         setEditPaymentApplication(paymentApplicationObject);
       }
     }
+    if (formData) {
+      const serviceProvider = formData.find(
+        (item) => item.partName === "Service Provider 1"
+      );
+      if (serviceProvider) {
+        // Parse the JSON string from partResponse to an object
+        const serviceProviderObject = JSON.parse(serviceProvider.partResponse);
+        // Set the parsed object to state
+        setEditServiceProvider(serviceProviderObject);
+      }
+    }
+    if (formData) {
+      const executiveInformation = formData.find(
+        (item) => item.partName === "Executive Information"
+      );
+      if (executiveInformation) {
+        // Parse the JSON string from partResponse to an object
+        const executiveInformationObject = JSON.parse(
+          executiveInformation.partResponse
+        );
+        // Set the parsed object to state
+        setEditExecutiveInformation(executiveInformationObject);
+      }
+    }
   }, [formData]);
 
   console.log("companyName", editCompanyName);
@@ -205,7 +252,7 @@ const Tabsection1 = ({ onNext }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.1.199:8181/api/GetFormDataByFormIdAndMerchantId?formId=${fId}&merchantId=${mId}`
+          `${apiUrl}GetFormDataByFormIdAndMerchantId?formId=${fId}&merchantId=${mId}`
         );
         setFormData(response.data?.data);
       } catch (error) {
@@ -227,7 +274,7 @@ const Tabsection1 = ({ onNext }) => {
       };
 
       const response = await axios.post(
-        "http://192.168.1.199:8181/api/CreateMerchantFormSubmissions",
+        `${apiUrl}CreateMerchantFormSubmissions`,
         payload,
         {
           headers: {
@@ -691,11 +738,11 @@ const Tabsection1 = ({ onNext }) => {
     ];
 
     // API endpoint and posting logic
-    const apiUrl = "http://192.168.1.199:8181/api/CreateMerchantFormParts";
+    const apiurl = `${apiUrl}CreateMerchantFormParts`;
 
     for (const part of combinedParts) {
       try {
-        const response = await axios.post(apiUrl, part);
+        const response = await axios.post(apiurl, part);
         console.log(`Response for ${part.partName}:`, response.data);
         setActiveSubmit(true);
       } catch (error) {
@@ -784,7 +831,7 @@ const Tabsection1 = ({ onNext }) => {
                           value={editCompanyName}
                           onChange={(e) => setEditCompanyName(e.target.value)}
                           label="Company Name"
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" " // Blank helper text to align fields
@@ -804,7 +851,7 @@ const Tabsection1 = ({ onNext }) => {
                           value={editDba}
                           onChange={(e) => setEditDba(e.target.value)}
                           helperText=" "
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           required
@@ -823,7 +870,7 @@ const Tabsection1 = ({ onNext }) => {
                           value={editContactName}
                           onChange={(e) => setEditContactName(e.target.value)}
                           helperText=" "
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           required
@@ -841,7 +888,7 @@ const Tabsection1 = ({ onNext }) => {
                           value={editTitle}
                           label="Title"
                           onChange={(e) => setEditTitle(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -859,7 +906,7 @@ const Tabsection1 = ({ onNext }) => {
                           id="telephone"
                           value={editTelephone}
                           onChange={(e) => setEditTelephone(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           label="Telephone"
@@ -879,7 +926,7 @@ const Tabsection1 = ({ onNext }) => {
                           label="E-mail"
                           value={editEmail}
                           onChange={(e) => setEditEmail(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -906,7 +953,7 @@ const Tabsection1 = ({ onNext }) => {
                           // value={
                           //   (formData && formData[6]?.partResponse) || country
                           // }
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           onChange={
@@ -931,7 +978,7 @@ const Tabsection1 = ({ onNext }) => {
                                 ? editState
                                 : state
                             }
-                            InputLabelProps={{
+                            inputlabelprops={{
                               shrink: true,
                             }}
                             required
@@ -974,7 +1021,7 @@ const Tabsection1 = ({ onNext }) => {
                           label="City"
                           value={editCity}
                           onChange={(e) => setEditCity(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -994,7 +1041,7 @@ const Tabsection1 = ({ onNext }) => {
                           label="URL"
                           value={editUrl}
                           onChange={(e) => setEditUrl(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -1014,7 +1061,7 @@ const Tabsection1 = ({ onNext }) => {
                           label="Pincode"
                           value={editPincode}
                           onChange={(e) => setEditPincode(e.target.value)}
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -1036,7 +1083,7 @@ const Tabsection1 = ({ onNext }) => {
                           onChange={(e) =>
                             setEditBusinessAddress(e.target.value)
                           }
-                          InputLabelProps={{
+                          inputlabelprops={{
                             shrink: true,
                           }}
                           helperText=" "
@@ -1139,7 +1186,7 @@ const Tabsection1 = ({ onNext }) => {
                         onChange={(e) =>
                           setEditTransactionHandler(e.target.value)
                         }
-                        InputLabelProps={{
+                        inputlabelprops={{
                           shrink: true,
                         }}
                         style={{
@@ -1164,7 +1211,7 @@ const Tabsection1 = ({ onNext }) => {
                         placeholder=" Mention here card details"
                         value={editCardDetails}
                         onChange={(e) => setEditCardDetails(e.target.value)}
-                        InputLabelProps={{
+                        inputlabelprops={{
                           shrink: true,
                         }}
                         required
@@ -1265,7 +1312,7 @@ const Tabsection1 = ({ onNext }) => {
                                       ? editFacilityData.type
                                       : row.type
                                   }
-                                  InputLabelProps={{
+                                  inputlabelprops={{
                                     shrink: true,
                                   }}
                                   onChange={
@@ -1474,8 +1521,14 @@ const Tabsection1 = ({ onNext }) => {
                                   required
                                   className={classes.formField}
                                   // value={app.name}
-                                  onChange={(e) =>
-                                    handleInputChange1(e, index, "name")
+                                  onChange={
+                                    formData && formData.length > 0
+                                      ? (e) =>
+                                          setEditPaymentApplication(
+                                            e.target.value
+                                          )
+                                      : (e) =>
+                                          handleInputChange1(e, index, "name")
                                   }
                                   fullWidth
                                   value={
@@ -1645,13 +1698,18 @@ const Tabsection1 = ({ onNext }) => {
                             placeholder="http://www.example.com"
                             // value={websiteUrl}
                             value={
-                              (formData && formData[16]?.partResponse) ||
-                              websiteUrl
+                              formData && formData.length > 0
+                                ? editMerchantUrl
+                                : websiteUrl
                             }
-                            InputLabelProps={{
+                            inputlabelprops={{
                               shrink: true,
                             }}
-                            onChange={(e) => setWebsiteUrl(e.target.value)}
+                            onChange={
+                              formData && formData.length > 0
+                                ? (e) => setEditMerchantUrl(e.target.value)
+                                : (e) => setWebsiteUrl(e.target.value)
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1667,15 +1725,24 @@ const Tabsection1 = ({ onNext }) => {
                             variant="outlined"
                             placeholder="e.g., Octopot"
                             // value={erpName}
+                            // value={
+                            //   (formData && formData[17]?.partResponse) ||
+                            //   erpName
+                            // }
                             value={
-                              (formData && formData[17]?.partResponse) ||
-                              erpName
+                              formData && formData.length > 0
+                                ? editErpName
+                                : erpName
                             }
-                            InputLabelProps={{
+                            inputlabelprops={{
                               shrink: true,
                             }}
                             required
-                            onChange={(e) => setErpName(e.target.value)}
+                            onChange={
+                              formData && formData.length > 0
+                                ? (e) => setEditErpName(e.target.value)
+                                : (e) => setErpName(e.target.value)
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1692,14 +1759,23 @@ const Tabsection1 = ({ onNext }) => {
                             variant="outlined"
                             placeholder="e.g., CC Avenues / Razorpay / Billdesk"
                             // value={paymentGateway}
+                            // value={
+                            //   (formData && formData[18]?.partResponse) ||
+                            //   paymentGateway
+                            // }
                             value={
-                              (formData && formData[18]?.partResponse) ||
-                              paymentGateway
+                              formData && formData.length > 0
+                                ? editPaymentGateway
+                                : paymentGateway
                             }
-                            InputLabelProps={{
+                            inputlabelprops={{
                               shrink: true,
                             }}
-                            onChange={(e) => setPaymentGateway(e.target.value)}
+                            onChange={
+                              formData && formData.length > 0
+                                ? (e) => setEditPaymentGateway(e.target.value)
+                                : (e) => setPaymentGateway(e.target.value)
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1716,15 +1792,23 @@ const Tabsection1 = ({ onNext }) => {
                             variant="outlined"
                             placeholder="e.g., Juspay"
                             // value={thirdPartyService}
+                            // value={
+                            //   (formData && formData[19]?.partResponse) ||
+                            //   thirdPartyService
+                            // }
                             value={
-                              (formData && formData[19]?.partResponse) ||
-                              thirdPartyService
+                              formData && formData.length > 0
+                                ? editThirdServiceProvider
+                                : thirdPartyService
                             }
-                            InputLabelProps={{
+                            inputlabelprops={{
                               shrink: true,
                             }}
-                            onChange={(e) =>
-                              setThirdPartyService(e.target.value)
+                            onChange={
+                              formData && formData.length > 0
+                                ? (e) =>
+                                    setEditThirdServiceProvider(e.target.value)
+                                : (e) => setThirdPartyService(e.target.value)
                             }
                           />
                         </Grid>
@@ -1802,19 +1886,24 @@ const Tabsection1 = ({ onNext }) => {
                                         : isFormEditable
                                     }
                                     value={
-                                      formData && formData[20]?.partResponse
-                                        ? JSON.parse(formData[20].partResponse)
-                                            ?.name || provider.name
+                                      formData && formData.length > 0
+                                        ? editServiceProvider.name
                                         : provider.name
                                     }
                                     required
                                     // value={provider.name}
-                                    onChange={(e) =>
-                                      handleServiceProviderChange(
-                                        index,
-                                        "name",
-                                        e.target.value
-                                      )
+                                    onChange={
+                                      formData && formData.length > 0
+                                        ? (e) =>
+                                            setEditServiceProvider(
+                                              e.target.value
+                                            )
+                                        : (e) =>
+                                            handleServiceProviderChange(
+                                              index,
+                                              "name",
+                                              e.target.value
+                                            )
                                     }
                                     fullWidth
                                   />
@@ -1827,20 +1916,24 @@ const Tabsection1 = ({ onNext }) => {
                                         : isFormEditable
                                     }
                                     required
+                                    // value={provider.description}
                                     value={
-                                      formData && formData[20]?.partResponse
-                                        ? JSON.parse(formData[20].partResponse)
-                                            ?.description ||
-                                          provider.description
+                                      formData && formData.length > 0
+                                        ? editServiceProvider.description
                                         : provider.description
                                     }
-                                    // value={provider.description}
-                                    onChange={(e) =>
-                                      handleServiceProviderChange(
-                                        index,
-                                        "description",
-                                        e.target.value
-                                      )
+                                    onChange={
+                                      formData && formData.length > 0
+                                        ? (e) =>
+                                            setEditServiceProvider(
+                                              e.target.value
+                                            )
+                                        : (e) =>
+                                            handleServiceProviderChange(
+                                              index,
+                                              "description",
+                                              e.target.value
+                                            )
                                     }
                                     fullWidth
                                   />
@@ -1927,17 +2020,22 @@ const Tabsection1 = ({ onNext }) => {
                             : isFormEditable
                         }
                         required
-                        // value={executiveName}
                         value={
-                          formData && formData[21]?.partResponse
-                            ? JSON.parse(formData[21].partResponse)
-                                ?.executiveName || executiveName
+                          formData && formData.length > 0
+                            ? editExecutiveInformation.executiveName
                             : executiveName
                         }
-                        onChange={handleExecutiveNameChange}
+                        onChange={
+                          formData && formData.length > 0
+                            ? (e) => setEditExecutiveInformation(e.target.value)
+                            : handleExecutiveNameChange
+                        }
                         label="Executive Officer Name"
                         className={classes.formField}
                         sx={{ width: 200 }}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
                       />
                     </Box>
                   </Box>
@@ -1965,18 +2063,24 @@ const Tabsection1 = ({ onNext }) => {
                             : isFormEditable
                         }
                         required
-                        value={
-                          formData && formData[21]?.partResponse
-                            ? JSON.parse(formData[21].partResponse)
-                                ?.executiveTitle || executiveTitle
-                            : executiveTitle
-                        }
                         // value={executiveTitle}
                         // value={patchExecutiveTitle}
-                        onChange={handleExecutiveTitleChange}
+                        value={
+                          formData && formData.length > 0
+                            ? editExecutiveInformation.executiveTitle
+                            : executiveTitle
+                        }
+                        onChange={
+                          formData && formData.length > 0
+                            ? (e) => setEditExecutiveInformation(e.target.value)
+                            : handleExecutiveTitleChange
+                        }
                         className={classes.formField}
                         label="Title"
                         sx={{ width: 200 }}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
                       />
                     </Box>
 

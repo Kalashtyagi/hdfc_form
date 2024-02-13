@@ -29,6 +29,8 @@ const useStyles = makeStyles((theme) => ({
   // Additional custom styles...
 }));
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 export default function Sign() {
   const [apiImage, setApiImage] = useState(null);
   const [signatureImage, setSignatureImage] = useState(null);
@@ -40,7 +42,7 @@ export default function Sign() {
 
   useEffect(() => {
     const fetchImage = async () => {
-      const apiurl = `http://192.168.1.199:8181/api/ImageUpload/GetImage?formId=${fId}&merchantId=${mId}`;
+      const apiurl = `${apiUrl}ImageUpload/GetImage?formId=${fId}&merchantId=${mId}`;
 
       try {
         const response = await fetch(apiurl);
@@ -84,15 +86,11 @@ export default function Sign() {
       formData.append("formId", fId);
       formData.append("merchantId", mId);
 
-      const response = await axios.post(
-        "http://192.168.1.199:8181/api/InsertImage",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${apiUrl}InsertImage`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       const result = await response.data;
 
       console.log("Response:", response.data);
@@ -116,15 +114,11 @@ export default function Sign() {
       formData.append("merchantId", mId);
       console.log("image", apiImage);
 
-      const response = await axios.put(
-        "http://192.168.1.199:8181/api/UpdateImage",
-        formData,
-        {
-          headers: {
-            "Content-Type": "applicatin/json",
-          },
-        }
-      );
+      const response = await axios.put(`${apiUrl}UpdateImage`, formData, {
+        headers: {
+          "Content-Type": "applicatin/json",
+        },
+      });
       const result = await response.data;
 
       console.log("Response:", response.data);
