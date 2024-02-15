@@ -178,9 +178,8 @@ const Tabsection1 = ({ onNext }) => {
     }
     if (formData) {
       // Find the item with partName "Facility 1"
-      const facilityItem = formData.find(
-        (item) => item.partName === "Facility 1"
-      );
+      const facilityItem =
+        formData && formData.find((item) => item.partName === "Facility 1");
       if (facilityItem) {
         // Parse the JSON string from partResponse to an object
         const facilityObject = JSON.parse(facilityItem.partResponse);
@@ -191,9 +190,9 @@ const Tabsection1 = ({ onNext }) => {
 
     if (formData) {
       // Find the item with partName "Facility 1"
-      const paymentApplication = formData.find(
-        (item) => item.partName === "Payment Application 1"
-      );
+      const paymentApplication =
+        formData &&
+        formData.find((item) => item.partName === "Payment Application 1");
       if (paymentApplication) {
         // Parse the JSON string from partResponse to an object
         const paymentApplicationObject = JSON.parse(
@@ -204,9 +203,9 @@ const Tabsection1 = ({ onNext }) => {
       }
     }
     if (formData) {
-      const serviceProvider = formData.find(
-        (item) => item.partName === "Service Provider 1"
-      );
+      const serviceProvider =
+        formData &&
+        formData.find((item) => item.partName === "Service Provider 1");
       if (serviceProvider) {
         // Parse the JSON string from partResponse to an object
         const serviceProviderObject = JSON.parse(serviceProvider.partResponse);
@@ -215,9 +214,9 @@ const Tabsection1 = ({ onNext }) => {
       }
     }
     if (formData) {
-      const executiveInformation = formData.find(
-        (item) => item.partName === "Executive Information"
-      );
+      const executiveInformation =
+        formData &&
+        formData.find((item) => item.partName === "Executive Information");
       if (executiveInformation) {
         // Parse the JSON string from partResponse to an object
         const executiveInformationObject = JSON.parse(
@@ -320,9 +319,10 @@ const Tabsection1 = ({ onNext }) => {
 
     // Proceed with the PATCH request if there are changes
     if (patchData.length > 0) {
+      const partName = formData[0].partName;
       try {
         const response = await axios.patch(
-          `${apiUrl}PatchMerchantFormParts?formId=${fId}&merchantId=${mId}`,
+          `${apiUrl}PatchMerchantFormParts?formId=${fId}&merchantId=${mId}&partName=${partName}`,
           patchData,
           {
             headers: {
